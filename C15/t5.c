@@ -1,0 +1,60 @@
+#include <stdio.h>
+#include <limits.h>
+
+unsigned int rotate_l(unsigned int, int);
+char* int_to_bin(unsigned int, char*);
+unsigned int bin_to_int(const char* str);
+char* reverse(char* str, int p1, int p2);
+
+int main(void) {
+	const int size = CHAR_BIT * sizeof(unsigned int);
+	char bin_str[size + 1];
+	unsigned int num = 3252385;
+	unsigned int tmp;
+	for (int i = 0; i < 65; ++i) {
+		tmp = rotate_l(num, i);
+		printf("(%u, %d) = %16u, %s.\n", num, i, tmp, int_to_bin(tmp, bin_str));
+	}
+
+	return 0;
+}
+
+unsigned int rotate_l(unsigned int num, int shift) {
+	const static int size = CHAR_BIT * sizeof(unsigned int);
+	char bin_str[size + 1];
+	shift %= size;
+	int_to_bin(num, bin_str);
+	reverse(bin_str, 0, shift - 1);
+	reverse(bin_str, shift, size - 1);
+	reverse(bin_str, 0, size - 1);
+	return bin_to_int(bin_str);
+}
+
+char* int_to_bin(unsigned int num, char* bin_str) {
+	const static int size = CHAR_BIT * sizeof(unsigned int);
+	for (int i = size - 1; i >= 0; --i) {
+		bin_str[i] = (num & 0x1) + '0';
+		num >>= 1;
+	}
+	bin_str[size] = '\0';
+	return bin_str;
+}
+
+unsigned int bin_to_int(const char* str) {
+	unsigned int num = 0;
+	while (*str != '\0') {
+		num = (num << 1) + (*str++ - '0');
+	}
+	return num;
+}
+
+char* reverse(char* str, int p1, int p2) {
+	int steps = (p2 - p1 + 1) / 2;
+	char bit;
+	for (int i = 0; i < steps; ++i) {
+		bit = str[p1 + i];
+		str[p1 + i] = str[p2 - i];
+		str[p2 - i] = bit;
+	}
+	return str;
+}
